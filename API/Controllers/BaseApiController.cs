@@ -1,13 +1,13 @@
-using MediatR;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class BaseApiController : ControllerBase
+namespace API.Controllers
 {
-    private IMediator _mediator;
-    protected IMediator Mediator => _mediator ?? (_mediator = HttpContext.RequestServices.GetService<IMediator>());
-
+    [ApiController]
+    [Route("[controller]")]
+    [Authorize]
+    public class BaseApiController :ControllerBase
+    {
+        
+    }
 }

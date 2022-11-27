@@ -1,41 +1,93 @@
-using Domain;
+﻿//vai ser usada para create novos posts
+
+using System.Net;
+using Application.Interfaces;
+using Application.Dtos;
+using Application.Errors;
+using Application.Interfaces;
+using AutoMapper;
+using Doiman;
+using FluentValidation;
 using MediatR;
-using Persistance;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
-namespace Application.Posts;
-
-public class CreatePost
+namespace Application.Posts
 {
-    public class CreatePostCommand : IRequest<Post>
+    public class CreatePost
     {
-        public int Id { get; set; }
-        public string Content { get; set; }
-        public string Image { get; set; }
-    }
-
-    public class CreatePostHandler : IRequestHandler<CreatePostCommand, Post>
-    {
-        private readonly DataContext _context;
-
-        public CreatePostHandler(DataContext context)
+        //recebe os dados que vem do mediator na classe PostController
+        public class CreatePostCommand :IRequest<PostDto>
         {
-            _context = context;
+            //os dados que eu quero armazenar
+            public string Title { get; set; }
+            public string Content { get; set; }
+            public string Image { get; set; }
         }
-        public async Task<Post> Handle(CreatePostCommand request, CancellationToken cancellationToken)
-        {
-            var post = new Post()
-            {
-                Content = request.Content,
-                Image = request.Image
-            };
-            await _context.Posts.AddAsync(post);
-            var result = await _context.SaveChangesAsync(cancellationToken) < 0;
-            if (result)
-            {
-                throw new Exception("An Error Occurred");
-            }
 
-            return post;
+        //classe para validarmos os dados que vem do da Classe CreatePostcommand
+        public class CreatePostValidator :AbstractValidator<CreatePostCommand>
+        {
+            public CreatePostValidator()
+            {
+                RuleFor(x=>x.Image).NotEmpty();
+                RuleFor(x=>x.Title).NotEmpty();
+            }
+        }
+        //onde teremos a logica toda da criacao de um post
+        public  class CreatePostCommandHandle :IRequestHandler<CreatePostCommand,PostDto>
+        {
+            private readonly DataContext _context;
+            private readonly IMapper _mapper;
+            private readonly UserManager<User> _userManager;
+            private readonly IPostRepository _postRepository;
+            private readonly IUserAccessor _userAccessor;
+            
+
+            public CreatePostCommandHandle(DataContext context, IMapper mapper, UserManager<User> userManager, IPostRepository postRepository, IUserAccessor userAccessor)
+            {
+                _context = context;
+                _mapper = mapper;
+                _userManager = userManager;
+                _postRepository = postRepository;
+                _userAccessor = userAccessor;
+            }
+            public async Task<PostDto> Handle(CreatePostCommand request, CancellationToken cancellationToken)
+            {
+                var user = await _userManager.FindByIdAsync(_userAccessor.GetCurrentUserId());
+                if (user is null) throw new RestException(HttpStatusCode.NotFound, "User not found");
+                //validacao dos dados
+                var postFound=await _context.Post.FirstOrDefaultAsync(post1 => post1.Title == request.Title);//se nao existe vai retornar null
+
+                if (postFound != null)
+                {
+                    throw new RestException(HttpStatusCode.Conflict, "The post already exists");
+                }
+                // DateTimeOffset.Now.DateTime
+                var post = new Post()
+                {
+                    Creationdate = DateTimeOffset.UtcNow,
+                    Image = request.Image,
+                    Title = request.Title,
+                    Content = request.Content,
+                    User = user
+                };
+                
+                //add os dados na base de dados.
+               //await  _context.Post.AddAsync(post, cancellationToken);
+               
+               //faz commit, para salvar as alteracoes
+               _postRepository.Add(post);//vai retornar um valor int
+               var result = await _postRepository.Complete() < 0;
+               if (result)
+               {
+                   throw new Exception("AN ERROR OCCURRED");
+               }
+
+               return _mapper.Map<Post, PostDto>(post);
+                //retorna esse post para o mediator na classe PostsController
+            }
         }
     }
 }

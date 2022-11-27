@@ -1,15 +1,18 @@
-using Domain;
+﻿using Doiman;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistance;
-
-public class DataContext : DbContext
+// classe que serve para interacao com a base de dados.
+namespace Persistence
 {
-    public DataContext(DbContextOptions<DataContext> options):base(options)
+    public class DataContext : IdentityDbContext //vem do entity framework
     {
-        
-    }
+        // a propriedade base refecencia o construtor da classe Dbcontex
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+        }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Post> Posts { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Post> Post { get; set; } //essa variavel vai ser usada para fazer todas operacos da base de dados
+    }
 }

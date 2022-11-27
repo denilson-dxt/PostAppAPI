@@ -1,8 +1,15 @@
-namespace Domain;
+﻿using System;
+using System.IO;
 
-public class Post
+namespace Doiman
 {
-    public int Id { get; set; }
-    public string Content { get; set; }
-    public string Image { get; set; }
+    public class Post
+    {
+        public int  Id { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public string Image { get; set; }
+        public  DateTimeOffset Creationdate { get; set; }
+        public User User { get; set; }
+    }
 }
