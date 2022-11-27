@@ -30,14 +30,13 @@ public class ListPostId
 
         public async Task<PostDto> Handle(ListPostIdQuery request, CancellationToken cancellationToken)
         {
-            //validacao dos dados
             var post =
                 await _context.Post.Include(p=>p.User).FirstOrDefaultAsync(post1 =>
                     post1.Id == request.Id); //se nao existe vai retornar null
 
             if (post == null)
             {
-                throw new RestException(HttpStatusCode.NotFound,"Error, Post doens exist!!");
+                throw new RestException(HttpStatusCode.NotFound,"Error, Post doesnt exist!!");
             }
 
             return _mapper.Map<PostDto>(post);

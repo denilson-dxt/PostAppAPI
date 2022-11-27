@@ -17,16 +17,13 @@ namespace Application.Posts
 {
     public class CreatePost
     {
-        //recebe os dados que vem do mediator na classe PostController
         public class CreatePostCommand :IRequest<PostDto>
         {
-            //os dados que eu quero armazenar
             public string Title { get; set; }
             public string Content { get; set; }
             public string Image { get; set; }
         }
 
-        //classe para validarmos os dados que vem do da Classe CreatePostcommand
         public class CreatePostValidator :AbstractValidator<CreatePostCommand>
         {
             public CreatePostValidator()
@@ -35,7 +32,6 @@ namespace Application.Posts
                 RuleFor(x=>x.Title).NotEmpty();
             }
         }
-        //onde teremos a logica toda da criacao de um post
         public  class CreatePostCommandHandle :IRequestHandler<CreatePostCommand,PostDto>
         {
             private readonly DataContext _context;
@@ -57,14 +53,14 @@ namespace Application.Posts
             {
                 var user = await _userManager.FindByIdAsync(_userAccessor.GetCurrentUserId());
                 if (user is null) throw new RestException(HttpStatusCode.NotFound, "User not found");
-                //validacao dos dados
+
                 var postFound=await _context.Post.FirstOrDefaultAsync(post1 => post1.Title == request.Title);//se nao existe vai retornar null
 
                 if (postFound != null)
                 {
                     throw new RestException(HttpStatusCode.Conflict, "The post already exists");
                 }
-                // DateTimeOffset.Now.DateTime
+
                 var post = new Post()
                 {
                     Creationdate = DateTimeOffset.UtcNow,
@@ -74,11 +70,8 @@ namespace Application.Posts
                     User = user
                 };
                 
-                //add os dados na base de dados.
-               //await  _context.Post.AddAsync(post, cancellationToken);
                
-               //faz commit, para salvar as alteracoes
-               _postRepository.Add(post);//vai retornar um valor int
+               _postRepository.Add(post);
                var result = await _postRepository.Complete() < 0;
                if (result)
                {
@@ -86,7 +79,6 @@ namespace Application.Posts
                }
 
                return _mapper.Map<Post, PostDto>(post);
-                //retorna esse post para o mediator na classe PostsController
             }
         }
     }

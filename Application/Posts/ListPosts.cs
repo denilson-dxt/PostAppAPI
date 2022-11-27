@@ -11,7 +11,6 @@ public class ListPosts
 {
     public class ListPostsQuery : IRequest<List<PostDto>>
     {
-        //nao colocamos nada aqui poque vai retornar os posts
     }
 
     public class ListPostsQueryHabdler : IRequestHandler<ListPostsQuery, List<PostDto>>
