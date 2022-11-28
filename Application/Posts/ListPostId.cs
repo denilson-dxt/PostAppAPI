@@ -20,7 +20,6 @@ public class ListPostId
 
     public class ListPostByIdHandler : IRequestHandler<ListPostIdQuery, PostDto>
     {
-        private readonly DataContext _context;
         private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
 

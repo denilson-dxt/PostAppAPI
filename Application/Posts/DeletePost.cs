@@ -17,7 +17,6 @@ public class DeletePost
     }
     public class DeletePostCommandHandler : IRequestHandler<DeletePostCommand, PostDto>
     {
-        private readonly DataContext _context;
         private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
         private readonly IUserAccessor _userAccessor;

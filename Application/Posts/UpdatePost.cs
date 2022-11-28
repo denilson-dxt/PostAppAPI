@@ -23,15 +23,13 @@ public class UpdatePost
     public class UpdatePostHandler : IRequestHandler<UpdatePostCommand, PostDto>
     {
         private readonly IPostRepository _postRepository;
-        private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IUserAccessor _userAccessor;
         private readonly UserManager<User> _userManager;
 
-        public UpdatePostHandler(IPostRepository postRepository,DataContext context, IMapper mapper, IUserAccessor userAccessor, UserManager<User> userManager)
+        public UpdatePostHandler(IPostRepository postRepository, IMapper mapper, IUserAccessor userAccessor, UserManager<User> userManager)
         {
             _postRepository = postRepository;
-            _context = context;
             _mapper = mapper;
             _userAccessor = userAccessor;
             _userManager = userManager;

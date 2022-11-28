@@ -34,7 +34,6 @@ namespace Application.Posts
         }
         public  class CreatePostCommandHandle :IRequestHandler<CreatePostCommand,PostDto>
         {
-            private readonly DataContext _context;
             private readonly IMapper _mapper;
             private readonly UserManager<User> _userManager;
             private readonly IPostRepository _postRepository;
