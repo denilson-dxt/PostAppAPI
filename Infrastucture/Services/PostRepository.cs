@@ -17,24 +17,24 @@ public class PostRepository:IPostRepository
         _context.Set<Post>().Add(post);
     }
 
-    public Post Update(Post post)
+    public void Update(Post post)
     {
-        throw new NotImplementedException();
+        _context.Set<Post>().Update(post);
     }
 
-    public Post Delete(int id)
+    public void Delete(Post post)
     {
-        throw new NotImplementedException();
+        _context.Set<Post>().Remove(post);
     }
 
     public List<Post> ListAll()
     {
-        throw new NotImplementedException();
+        return _context.Set<Post>().ToList();
     }
 
     public Post ListById(int id)
     {
-        throw new NotImplementedException();
+       return _context.Set<Post>().Find(id);
     }
 
     public async Task<int> Complete()
