@@ -41,9 +41,8 @@ namespace Application.Posts
             private readonly IUserAccessor _userAccessor;
             
 
-            public CreatePostCommandHandle(DataContext context, IMapper mapper, UserManager<User> userManager, IPostRepository postRepository, IUserAccessor userAccessor)
+            public CreatePostCommandHandle(IMapper mapper, UserManager<User> userManager, IPostRepository postRepository, IUserAccessor userAccessor)
             {
-                _context = context;
                 _mapper = mapper;
                 _userManager = userManager;
                 _postRepository = postRepository;
@@ -54,7 +53,7 @@ namespace Application.Posts
                 var user = await _userManager.FindByIdAsync(_userAccessor.GetCurrentUserId());
                 if (user is null) throw new RestException(HttpStatusCode.NotFound, "User not found");
 
-                var postFound=await _context.Post.FirstOrDefaultAsync(post1 => post1.Title == request.Title);//se nao existe vai retornar null
+                var postFound=_postRepository.FilterOne(post1 => post1.Title == request.Title);//se nao existe vai retornar null
 
                 if (postFound != null)
                 {

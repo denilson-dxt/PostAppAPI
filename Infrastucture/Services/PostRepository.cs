@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Interfaces;
 using Doiman;
 using Persistence;
@@ -40,5 +41,10 @@ public class PostRepository:IPostRepository
     public async Task<int> Complete()
     {
         return await _context.SaveChangesAsync();
+    }
+
+    public Post FilterOne(Expression<Func<Post, bool>> query = null)
+    {
+        return _context.Post.FirstOrDefault(query);
     }
 }

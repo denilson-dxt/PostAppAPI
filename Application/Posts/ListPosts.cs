@@ -1,4 +1,6 @@
 ﻿using Application.Dtos;
+using Application.Errors;
+using Application.Interfaces;
 using AutoMapper;
 using Doiman;
 using MediatR;
@@ -15,19 +17,19 @@ public class ListPosts
 
     public class ListPostsQueryHabdler : IRequestHandler<ListPostsQuery, List<PostDto>>
     {
-        private readonly DataContext _context;
+        private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
 
-        public ListPostsQueryHabdler(DataContext context, IMapper mapper)
+        public ListPostsQueryHabdler(IPostRepository postRepository, IMapper mapper)
+        
         {
-            _context = context;
+            _postRepository = postRepository;
             _mapper = mapper;
         }
 
         public async Task<List<PostDto>> Handle(ListPostsQuery request, CancellationToken cancellationToken)
         {
-            var posts = await _context.Post.Include(x => x.User).ToListAsync(cancellationToken);
-          
+            var posts = _postRepository.ListAll();
             return _mapper.Map<List<PostDto>>(posts);
         }
     }

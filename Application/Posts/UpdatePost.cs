@@ -22,13 +22,15 @@ public class UpdatePost
     }
     public class UpdatePostHandler : IRequestHandler<UpdatePostCommand, PostDto>
     {
+        private readonly IPostRepository _postRepository;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IUserAccessor _userAccessor;
         private readonly UserManager<User> _userManager;
 
-        public UpdatePostHandler(DataContext context, IMapper mapper, IUserAccessor userAccessor, UserManager<User> userManager)
+        public UpdatePostHandler(IPostRepository postRepository,DataContext context, IMapper mapper, IUserAccessor userAccessor, UserManager<User> userManager)
         {
+            _postRepository = postRepository;
             _context = context;
             _mapper = mapper;
             _userAccessor = userAccessor;
@@ -36,7 +38,7 @@ public class UpdatePost
         }
         public async Task<PostDto> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
         {
-            var post = await _context.Post.Include(p => p.User).FirstOrDefaultAsync(x => x.Id == request.Id);
+            var post = _postRepository.FilterOne(x => x.Id == request.Id);
 
             if (post is null)
             {
@@ -49,9 +51,9 @@ public class UpdatePost
             post.Title = request.Title;
             post.Content = request.Content;
 
-            _context.Post.Update(post);
+            _postRepository.Update(post);
 
-            var result = await _context.SaveChangesAsync(cancellationToken) < 0;
+            var result = await _postRepository.Complete() < 0;
             if (result)
             {
                 throw new Exception("An Error Occurred while updating");

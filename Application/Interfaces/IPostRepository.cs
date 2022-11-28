@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Doiman;
 
 namespace Application.Interfaces;
@@ -10,5 +11,6 @@ public interface IPostRepository
     List<Post> ListAll();
     Post ListById(int id);
     Task<int> Complete();
+    Post FilterOne(Expression<Func<Post, bool>> query = null);
 
 }
