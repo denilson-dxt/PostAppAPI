@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Interfaces;
 using Doiman;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Infrastruture.Services;
@@ -30,7 +31,7 @@ public class PostRepository:IPostRepository
 
     public List<Post> ListAll()
     {
-        return _context.Set<Post>().ToList();
+        return _context.Set<Post>().Include(p=>p.User).ToList();
     }
 
     public Post ListById(int id)
